@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "954789840132",
+    "project_id": "olusola-notes",
+    "storage_bucket": "olusola-notes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:954789840132:android:445f88d25d9938bca5bc51",
+        "android_client_info": {
+          "package_name": "com.example.new_begining"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_dZeFyJLOMGK-HJbPe3G3Jsz44tBkGrg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
