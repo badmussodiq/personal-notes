@@ -26,7 +26,14 @@ class HomePage extends StatelessWidget {
               if (user?.emailVerified ?? false) {
                 debugPrint('YOU ARE VERIFIED');
               } else {
-                debugPrint('YOU ARE NOT VERIFIED!');
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  debugPrint('YOU ARE NOT VERIFIED!');
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context1) => const VerifyEmailView(),
+                    ),
+                  );
+                });
               }
 
               return const Text('Done');
@@ -36,5 +43,19 @@ class HomePage extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class VerifyEmailView extends StatefulWidget {
+  const VerifyEmailView({super.key});
+
+  @override
+  State<VerifyEmailView> createState() => _VerifyEmailViewState();
+}
+
+class _VerifyEmailViewState extends State<VerifyEmailView> {
+  @override
+  Widget build(BuildContext context) {
+    return const Text("Verify your email");
   }
 }
