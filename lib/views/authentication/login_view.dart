@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:new_begining/firebase_options.dart';
+import 'package:new_begining/views/authentication/register_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -44,22 +45,28 @@ class _LoginViewState extends State<LoginView> {
             case ConnectionState.done:
               return Column(
                 children: [
-                  TextField(
-                    controller: _email,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter your email',
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _email,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your email',
+                      ),
                     ),
                   ),
-                  TextField(
-                    controller: _password,
-                    obscureText: true,
-                    enableSuggestions: false,
-                    // keyboardType: TextInputType.emailAddress,
-                    autocorrect: false,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter your password',
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _password,
+                      obscureText: true,
+                      enableSuggestions: false,
+                      // keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your password',
+                      ),
                     ),
                   ),
                   TextButton(
@@ -83,6 +90,18 @@ class _LoginViewState extends State<LoginView> {
                       }
                     },
                     child: Text('Login'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => RegisterView(),
+                          ),
+                        );
+                      });
+                    },
+                    child: const Text('Not registered yet? Register here!'),
                   ),
                 ],
               );

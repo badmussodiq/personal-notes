@@ -1,13 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:new_begining/views/home_page.dart';
-
 // entry point
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:new_begining/firebase_options.dart';
+import 'package:new_begining/views/root.dart';
+
+void main() async {
   // initialize widget flutter binding
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -26,7 +30,7 @@ void main() {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePage(),
+      home: const Root(),
     ),
   );
 }
