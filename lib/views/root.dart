@@ -27,7 +27,7 @@ class _RootState extends State<Root> {
           await user.reload();
           setState(() {
             _user = FirebaseAuth.instance.currentUser;
-            _loading = false; // ✅ finished loading
+            _loading = false; // finished loading
           });
         } catch (_) {
           // If reload fails (e.g., user deleted remotely), sign out
@@ -55,9 +55,13 @@ class _RootState extends State<Root> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      // 👈 show loader while waiting for auth state
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: Colors.cyan)),
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(color: Colors.cyan),
+          ),
+        ),
       );
     }
 
@@ -66,7 +70,7 @@ class _RootState extends State<Root> {
     } else if (!_user!.emailVerified) {
       return VerifyEmailView(user: _user!);
     } else {
-      return const Dashboard();
+      return const Home();
     }
   }
 }

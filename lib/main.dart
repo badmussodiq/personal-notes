@@ -2,6 +2,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:new_begining/firebase_options.dart';
+import 'package:new_begining/views/authentication/login_view.dart';
+import 'package:new_begining/views/authentication/register_view.dart';
+import 'package:new_begining/views/home_page.dart';
+
 import 'package:new_begining/views/root.dart';
 
 void main() async {
@@ -31,6 +35,22 @@ void main() async {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const Root(),
+      routes: {
+        '/': (context) => const Home(),
+        '/login/': (context) => const LoginView(),
+        '/register/': (context) => const RegisterView(),
+      },
+      // onGenerateRoute: (setting) {
+      //   if (setting.name == '/verify/') {
+      //     final user = setting.arguments as User;
+      //     return MaterialPageRoute(
+      //       builder: (context) {
+      //         return VerifyEmailView(user: user);
+      //       },
+      //     );
+      //   }
+      //   return null;
+      // },
     ),
   );
 }
