@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -11,6 +12,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  bool _loading = false;
 
   //This method set the initial state of application
   @override
@@ -58,43 +60,58 @@ class _LoginViewState extends State<LoginView> {
           ),
           TextButton(
             onPressed: () async {
+              // update loading state
+              setState(() {
+                _loading = true;
+              });
+              // Get email and password
               final email = _email.text;
               final password = _password.text;
 
+              // return;
               //
               try {
-                final userCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-
-                print(userCredential);
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
+                setState(() {
+                  _loading = false;
+                });
+                if (context.mounted) {
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/home/', (route) => false);
+                }
               } on FirebaseAuthException catch (e) {
+                setState(() {
+                  _loading = false;
+                });
                 if (e.code == 'invalid-credential') {
-                  print('Username or password incorrect');
+                  devtools.log('Invalid Credentials');
+                  if (context.mounted) {
+                    // show error to user
+                    await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const AlertDialog(
+                          title: Text('Invalid Credentials'),
+                        );
+                      },
+                    );
+                  }
                 }
               }
             },
-            child: Text('Login'),
+            child: !_loading
+                ? Text('Login')
+                : const CircularProgressIndicator(padding: EdgeInsets.all(4.0)),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(
                 context,
               ).pushNamedAndRemoveUntil('/register/', (route) => false);
-              // WidgetsBinding.instance.addPostFrameCallback((_) {
-              //   Navigator.of(context).pushNamedAndRemoveUntil(
-              //     '/register/',
-              //     (route) => false,
-              //   );
-              // This is anonymous routing function
-              //   // Navigator.of(context).pushReplacement(
-              //   //   MaterialPageRoute(
-              //   //     builder: (context) => RegisterView(),
-              //   //   ),
-              //   // );
-              // });
             },
             child: const Text('Not registered yet? Register here!'),
           ),

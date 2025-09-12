@@ -36,7 +36,7 @@ void main() async {
       ),
       home: const Root(),
       routes: {
-        '/': (context) => const Home(),
+        '/home/': (context) => const Home(),
         '/login/': (context) => const LoginView(),
         '/register/': (context) => const RegisterView(),
       },

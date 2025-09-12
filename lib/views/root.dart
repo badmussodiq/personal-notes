@@ -22,9 +22,11 @@ class _RootState extends State<Root> {
     super.initState();
 
     _authSub = FirebaseAuth.instance.authStateChanges().listen((user) async {
+      // if (mounted) return; // prevents setState on disposed widget
       if (user != null) {
         try {
           await user.reload();
+          // if (mounted) return;
           setState(() {
             _user = FirebaseAuth.instance.currentUser;
             _loading = false; // finished loading
@@ -32,13 +34,16 @@ class _RootState extends State<Root> {
         } catch (_) {
           // If reload fails (e.g., user deleted remotely), sign out
           await FirebaseAuth.instance.signOut();
+          // if (mounted) return;
           setState(() {
             _user = null;
             _loading = false;
           });
         }
       } else {
+        // if (mounted) return;
         setState(() {
+          // if (mounted) return;
           _user = null;
           _loading = false;
         });
