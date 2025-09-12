@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth, FirebaseAuthException;
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
@@ -81,7 +81,7 @@ class _LoginViewState extends State<LoginView> {
                 if (context.mounted) {
                   Navigator.of(
                     context,
-                  ).pushNamedAndRemoveUntil('/home/', (route) => false);
+                  ).pushNamedAndRemoveUntil('/notes/', (_) => false);
                 }
               } on FirebaseAuthException catch (e) {
                 setState(() {
