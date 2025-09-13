@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
 
 import 'package:new_begining/constants/routes.dart' show notesRoute;
 import 'package:new_begining/functions/show_error_dialog.dart' show showErrorDialog;
@@ -92,7 +91,7 @@ class _LoginViewState extends State<LoginView> {
                   _loading = false;
                 });
                 if (e.code == 'invalid-credential') {
-                  devtools.log('Invalid Credentials');
+          
                   if (context.mounted) {
                     // show error to user
                     await showErrorDialog(context, 'Invalid Credentials');
