@@ -1,6 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth, FirebaseAuthException;
+import 'package:firebase_auth/firebase_auth.dart'
+    show FirebaseAuth, FirebaseAuthException;
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
+
+import 'package:new_begining/constants/routes.dart' show notesRoute;
+import 'package:new_begining/functions/show_error_dialog.dart' show showErrorDialog;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -81,7 +85,7 @@ class _LoginViewState extends State<LoginView> {
                 if (context.mounted) {
                   Navigator.of(
                     context,
-                  ).pushNamedAndRemoveUntil('/notes/', (_) => false);
+                  ).pushNamedAndRemoveUntil(notesRoute, (_) => false);
                 }
               } on FirebaseAuthException catch (e) {
                 setState(() {
@@ -91,15 +95,19 @@ class _LoginViewState extends State<LoginView> {
                   devtools.log('Invalid Credentials');
                   if (context.mounted) {
                     // show error to user
-                    await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return const AlertDialog(
-                          title: Text('Invalid Credentials'),
-                        );
-                      },
-                    );
+                    await showErrorDialog(context, 'Invalid Credentials');
                   }
+                } else {
+                  if (context.mounted) {
+                    await showErrorDialog(context, 'Error: ${e.code}');
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  setState(() {
+                    _loading = false;
+                  });
+                  await showErrorDialog(context, e.toString());
                 }
               }
             },

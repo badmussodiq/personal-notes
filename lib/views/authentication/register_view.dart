@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:new_begining/constants/routes.dart' show loginRoute, notesRoute;
+import 'package:new_begining/functions/show_error_dialog.dart' show showErrorDialog;
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -94,12 +95,27 @@ class _RegisterViewState extends State<RegisterView> {
                 setState(() {
                   _loading = false;
                 });
-                if (e.code == 'weak-password') {
+                if (e.code == 'weak-password' && context.mounted) {
                   devtools.log("Weak Password");
-                } else if (e.code == 'email-already-in-use') {
+                  await showErrorDialog(context, 'Weak Password');
+                } else if (e.code == 'email-already-in-use' &&
+                    context.mounted) {
                   devtools.log('User already Exist');
-                } else if (e.code == 'invalid-email') {
+                  await showErrorDialog(context, 'User already Exist');
+                } else if (e.code == 'invalid-email' && context.mounted) {
                   devtools.log('Invalid Email format');
+                  await showErrorDialog(context, 'Invalid Email format');
+                } else {
+                  if (context.mounted) {
+                    await showErrorDialog(context, 'Error: ${e.code}');
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  setState(() {
+                    _loading = false;
+                  });
+                  await showErrorDialog(context, e.toString());
                 }
               }
             },

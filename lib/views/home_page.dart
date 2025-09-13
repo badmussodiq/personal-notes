@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:new_begining/constants/routes.dart';
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -34,7 +36,7 @@ class _HomeState extends State<Home> {
                     // navigate to login view and remove all previous routes
                     Navigator.of(
                       context,
-                    ).pushNamedAndRemoveUntil('/login/', (_) => false);
+                    ).pushNamedAndRemoveUntil(loginRoute, (_) => false);
                   }
                   break;
                 case MenuAction.settings:
