@@ -2,7 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
 import 'package:flutter/material.dart';
 
-import 'package:new_begining/constants/routes.dart' show loginRoute, notesRoute;
+import 'package:new_begining/constants/routes.dart'
+    show loginRoute, verifyEmailRoute;
 import 'package:new_begining/functions/show_error_dialog.dart'
     show showErrorDialog;
 
@@ -77,18 +78,20 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                  email: email,
-                  password: password,
-                );
+                final credential = await FirebaseAuth.instance
+                    .createUserWithEmailAndPassword(
+                      email: email,
+                      password: password,
+                    );
                 // set load state to false
                 setState(() {
                   _loading = false;
                 });
+                await credential.user?.sendEmailVerification();
                 if (context.mounted) {
                   Navigator.of(
                     context,
-                  ).pushNamedAndRemoveUntil(notesRoute, (_) => false);
+                  ).pushNamed(verifyEmailRoute, arguments: credential.user);
                 }
               } on FirebaseAuthException catch (e) {
                 // set load state to false

@@ -1,11 +1,13 @@
 // entry point
+import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:new_begining/constants/routes.dart'
-    show loginRoute, registerRoute, notesRoute;
+    show loginRoute, notesRoute, registerRoute, verifyEmailRoute;
 import 'package:new_begining/firebase_options.dart';
 import 'package:new_begining/views/authentication/login_view.dart';
 import 'package:new_begining/views/authentication/register_view.dart';
+import 'package:new_begining/views/authentication/verify_view.dart';
 import 'package:new_begining/views/home_page.dart';
 
 import 'package:new_begining/views/root.dart';
@@ -42,17 +44,17 @@ void main() async {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
       },
-      // onGenerateRoute: (setting) {
-      //   if (setting.name == '/verify/') {
-      //     final user = setting.arguments as User;
-      //     return MaterialPageRoute(
-      //       builder: (context) {
-      //         return VerifyEmailView(user: user);
-      //       },
-      //     );
-      //   }
-      //   return null;
-      // },
+      onGenerateRoute: (setting) {
+        if (setting.name == verifyEmailRoute) {
+          final user = setting.arguments as User;
+          return MaterialPageRoute(
+            builder: (context) {
+              return VerifyEmailView(user: user);
+            },
+          );
+        }
+        return null;
+      },
     ),
   );
 }

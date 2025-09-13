@@ -13,19 +13,36 @@ class VerifyEmailView extends StatefulWidget {
 class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text('Please Verify Your Email address before you can continue'),
-        TextButton(
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
-          ),
-          onPressed: () async {
-            await widget.user.sendEmailVerification();
-          },
-          child: const Text('Send email verification'),
+    return Scaffold(
+      appBar: AppBar(
+        // title: const Text('Verify Email'),
+        // backgroundColor: Colors.amber,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            const Text(
+              "We've send you an email verification, Please open it to verify your account",
+            ),
+            const Text(
+              "If you haven't received a verification email yet, press the button below",
+            ),
+            TextButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+              ),
+              onPressed: () async {
+                await widget.user.sendEmailVerification();
+              },
+              child: const Text(
+                'Resend Email Verification',
+                style: TextStyle(color: Colors.amber),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
