@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:new_begining/constants/routes.dart';
+import 'package:new_begining/services/auth/auth_services.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -31,7 +31,7 @@ class _HomeState extends State<Home> {
                   if (!shouldLogout) return;
                   // ignore: use_build_context_synchronously
                   // sign out the user from firebase
-                  await FirebaseAuth.instance.signOut();
+                  await AuthServices.firebase().logOut();
                   if (context.mounted) {
                     // navigate to login view and remove all previous routes
                     Navigator.of(

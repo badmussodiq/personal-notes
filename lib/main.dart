@@ -1,21 +1,29 @@
 // entry point
-import 'package:firebase_auth/firebase_auth.dart' show User;
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
 import 'package:new_begining/constants/routes.dart'
     show loginRoute, notesRoute, registerRoute, verifyEmailRoute;
-import 'package:new_begining/firebase_options.dart';
-import 'package:new_begining/views/authentication/login_view.dart';
-import 'package:new_begining/views/authentication/register_view.dart';
-import 'package:new_begining/views/authentication/verify_view.dart';
-import 'package:new_begining/views/home_page.dart';
 
-import 'package:new_begining/views/root.dart';
+import 'package:new_begining/services/auth/auth_services.dart'
+    show AuthServices;
+
+import 'package:new_begining/services/auth/auth_users.dart' show AuthUser;
+
+import 'package:new_begining/views/authentication/login_view.dart';
+
+import 'package:new_begining/views/authentication/register_view.dart'
+    show RegisterView;
+
+import 'package:new_begining/views/authentication/verify_view.dart'
+    show VerifyEmailView;
+import 'package:new_begining/views/home_page.dart' show Home;
+
+import 'package:new_begining/views/root.dart' show Root;
 
 void main() async {
   // initialize widget flutter binding
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await AuthServices.firebase().initialize();
   runApp(
     MaterialApp(
       title: 'Flutter Demo',
@@ -46,7 +54,7 @@ void main() async {
       },
       onGenerateRoute: (setting) {
         if (setting.name == verifyEmailRoute) {
-          final user = setting.arguments as User;
+          final user = setting.arguments as AuthUser;
           return MaterialPageRoute(
             builder: (context) {
               return VerifyEmailView(user: user);

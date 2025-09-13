@@ -1,11 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, FirebaseAuthException;
 import 'package:flutter/material.dart';
 
 import 'package:new_begining/constants/routes.dart'
     show loginRoute, verifyEmailRoute;
 import 'package:new_begining/functions/show_error_dialog.dart'
     show showErrorDialog;
+import 'package:new_begining/services/auth/auth_exceptions.dart';
+import 'package:new_begining/services/auth/auth_services.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -78,39 +78,45 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final credential = await FirebaseAuth.instance
-                    .createUserWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
+                await AuthServices.firebase().createUser(
+                  email: email,
+                  password: password,
+                );
                 // set load state to false
                 setState(() {
                   _loading = false;
                 });
-                await credential.user?.sendEmailVerification();
+                await AuthServices.firebase().sendEmailVerification();
+
                 if (context.mounted) {
-                  Navigator.of(
-                    context,
-                  ).pushNamed(verifyEmailRoute, arguments: credential.user);
+                  Navigator.of(context).pushNamed(
+                    verifyEmailRoute,
+                    arguments:
+                        AuthServices.firebase().currentUser?.firebaseUser,
+                  );
                 }
-              } on FirebaseAuthException catch (e) {
-                // set load state to false
+              } on WeakPasswordAuthException catch (_) {
                 setState(() {
                   _loading = false;
                 });
-                if (e.code == 'weak-password' && context.mounted) {
+                if (context.mounted) {
                   await showErrorDialog(context, 'Weak Password');
-                } else if (e.code == 'email-already-in-use' &&
-                    context.mounted) {
-                  await showErrorDialog(context, 'User already Exist');
-                } else if (e.code == 'invalid-email' && context.mounted) {
-                  await showErrorDialog(context, 'Invalid Email format');
-                } else {
-                  if (context.mounted) {
-                    await showErrorDialog(context, 'Error: ${e.code}');
-                  }
                 }
-              } catch (e) {
+              } on EmailAlreadyInUseAuthException catch (_) {
+                setState(() {
+                  _loading = false;
+                });
+                if (context.mounted) {
+                  await showErrorDialog(context, 'User already Exist');
+                }
+              } on InvalidEmailAuthException catch (_) {
+                setState(() {
+                  _loading = false;
+                });
+                if (context.mounted) {
+                  await showErrorDialog(context, 'Invalid Email format');
+                }
+              } on GenericAuthException catch (e) {
                 if (context.mounted) {
                   setState(() {
                     _loading = false;

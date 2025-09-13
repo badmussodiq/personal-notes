@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:new_begining/services/auth/auth_services.dart';
+import 'package:new_begining/services/auth/auth_users.dart';
 import 'package:new_begining/views/authentication/login_view.dart';
 import 'package:new_begining/views/authentication/verify_view.dart';
 import 'package:new_begining/views/home_page.dart';
@@ -13,42 +15,50 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
-  User? _user;
-  late final StreamSubscription<User?> _authSub;
+  AuthUser? _authUser;
+  late final StreamSubscription<AuthUser?> _authSub;
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
 
-    _authSub = FirebaseAuth.instance.authStateChanges().listen((user)async {
-      // if (mounted) return; // prevents setState on disposed widget
-      if (user != null) {
-        try {
-          await user.reload();
-          // if (mounted) return;
-          setState(() {
-            _user = FirebaseAuth.instance.currentUser;
-            _loading = false; // finished loading
-          });
-        } catch (_) {
-          // If reload fails (e.g., user deleted remotely), sign out
-          await FirebaseAuth.instance.signOut();
-          // if (mounted) return;
-          setState(() {
-            _user = null;
-            _loading = false;
-          });
-        }
-      } else {
-        // if (mounted) return;
-        setState(() {
-          // if (mounted) return;
-          _user = null;
-          _loading = false;
+    _authSub = FirebaseAuth.instance
+        .authStateChanges()
+        .map((user) {
+          return user != null ? AuthUser.fromFirebase(user) : null;
+        })
+        .listen((authUser) async {
+          // if (mounted) return; // prevents setState on disposed widget
+          if (authUser != null) {
+            try {
+              await authUser.reload();
+              if (mounted) {
+                setState(() {
+                  _authUser = AuthServices.firebase().currentUser;
+                  _loading = false; // finished loading
+                });
+              }
+            } catch (_) {
+              // If reload fails (e.g., user deleted remotely), sign out
+              await AuthServices.firebase().logOut();
+              if (mounted) {
+                setState(() {
+                  _authUser = null;
+                  _loading = false;
+                });
+              }
+            }
+          } else {
+            if (mounted) {
+              setState(() {
+                // if (mounted) return;
+                _authUser = null;
+                _loading = false;
+              });
+            }
+          }
         });
-      }
-    });
   }
 
   @override
@@ -70,10 +80,10 @@ class _RootState extends State<Root> {
       );
     }
 
-    if (_user == null) {
+    if (_authUser == null) {
       return const LoginView();
-    } else if (!_user!.emailVerified) {
-      return VerifyEmailView(user: _user!);
+    } else if (!_authUser!.isEmailVerified) {
+      return VerifyEmailView(user: _authUser!);
     } else {
       return const Home();
     }

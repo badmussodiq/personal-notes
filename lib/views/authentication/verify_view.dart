@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:new_begining/services/auth/auth_users.dart' show AuthUser;
 
 class VerifyEmailView extends StatefulWidget {
-  final User user;
+  final AuthUser user;
 
   const VerifyEmailView({super.key, required this.user});
 
@@ -33,7 +33,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
               ),
               onPressed: () async {
-                await widget.user.sendEmailVerification();
+                await widget.user.firebaseUser.sendEmailVerification();
               },
               child: const Text(
                 'Resend Email Verification',

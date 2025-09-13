@@ -1,10 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, FirebaseAuthException;
 import 'package:flutter/material.dart';
 
-import 'package:new_begining/constants/routes.dart' show notesRoute;
+import 'package:new_begining/constants/routes.dart'
+    show notesRoute, verifyEmailRoute;
 import 'package:new_begining/functions/show_error_dialog.dart'
     show showErrorDialog;
+import 'package:new_begining/services/auth/auth_exceptions.dart';
+import 'package:new_begining/services/auth/auth_services.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -75,30 +76,31 @@ class _LoginViewState extends State<LoginView> {
               // return;
               //
               try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                final authUser = await AuthServices.firebase().logIn(
                   email: email,
                   password: password,
                 );
                 setState(() {
                   _loading = false;
                 });
-                if (context.mounted) {
+                if (authUser.isEmailVerified && context.mounted) {
                   Navigator.of(
                     context,
                   ).pushNamedAndRemoveUntil(notesRoute, (_) => false);
-                }
-              } on FirebaseAuthException catch (e) {
-                setState(() {
-                  _loading = false;
-                });
-
-                // show error to user
-                if (e.code == 'invalid-credential' && context.mounted) {
-                  await showErrorDialog(context, 'Invalid Credentials');
                 } else if (context.mounted) {
-                  await showErrorDialog(context, 'Error: ${e.code}');
+                  Navigator.of(context).pushNamed(
+                    verifyEmailRoute,
+                    arguments: authUser.firebaseUser,
+                  );
                 }
-              } catch (e) {
+              } on BadCredentialsAuthException catch (_) {
+                if (context.mounted) {
+                  setState(() {
+                    _loading = false;
+                  });
+                  await showErrorDialog(context, "User or Password is wrong");
+                }
+              } on GenericAuthException catch (e) {
                 if (context.mounted) {
                   setState(() {
                     _loading = false;
@@ -106,6 +108,14 @@ class _LoginViewState extends State<LoginView> {
                   await showErrorDialog(context, e.toString());
                 }
               }
+              // catch (e) {
+              //   if (context.mounted) {
+              //     setState(() {
+              //       _loading = false;
+              //     });
+              //     await showErrorDialog(context, e.toString());
+              //   }
+              // }
             },
             child: !_loading
                 ? Text('Login')
