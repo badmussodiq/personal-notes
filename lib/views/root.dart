@@ -21,7 +21,7 @@ class _RootState extends State<Root> {
   void initState() {
     super.initState();
 
-    _authSub = FirebaseAuth.instance.authStateChanges().listen((user) async {
+    _authSub = FirebaseAuth.instance.authStateChanges().listen((user)async {
       // if (mounted) return; // prevents setState on disposed widget
       if (user != null) {
         try {
