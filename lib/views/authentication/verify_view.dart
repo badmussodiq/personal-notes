@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:new_begining/services/auth/auth_users.dart' show AuthUser;
+import 'package:new_begining/services/auth/auth_services.dart';
 
-class VerifyEmailView extends StatefulWidget {
-  final AuthUser user;
+class VerifyEmailView extends StatelessWidget {
+  // final AuthUser user;
 
-  const VerifyEmailView({super.key, required this.user});
+  const VerifyEmailView({super.key});
+  // const VerifyEmailView({super.key, required this.user});
 
-  @override
-  State<VerifyEmailView> createState() => _VerifyEmailViewState();
-}
-
-class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +29,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
               ),
               onPressed: () async {
-                await widget.user.firebaseUser.sendEmailVerification();
+                await AuthServices.firebase().sendEmailVerification();
               },
               child: const Text(
                 'Resend Email Verification',

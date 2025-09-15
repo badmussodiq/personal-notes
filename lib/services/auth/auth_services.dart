@@ -32,4 +32,9 @@ class AuthServices implements auth_provider.AuthProvider {
 
   @override
   Future<void> sendEmailVerification() => provider.sendEmailVerification();
+  
+  @override
+  Future<void> reload() {
+    return provider.reload();
+  }
 }

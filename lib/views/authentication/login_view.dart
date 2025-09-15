@@ -90,7 +90,7 @@ class _LoginViewState extends State<LoginView> {
                 } else if (context.mounted) {
                   Navigator.of(context).pushNamed(
                     verifyEmailRoute,
-                    arguments: authUser.firebaseUser,
+                    // arguments: authUser.firebaseUser,
                   );
                 }
               } on BadCredentialsAuthException catch (_) {

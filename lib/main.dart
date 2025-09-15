@@ -6,9 +6,7 @@ import 'package:new_begining/constants/routes.dart'
 
 import 'package:new_begining/services/auth/auth_services.dart'
     show AuthServices;
-
-import 'package:new_begining/services/auth/auth_users.dart' show AuthUser;
-
+    
 import 'package:new_begining/views/authentication/login_view.dart';
 
 import 'package:new_begining/views/authentication/register_view.dart'
@@ -51,18 +49,19 @@ void main() async {
         notesRoute: (context) => const Home(),
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
+        verifyEmailRoute: (context) => const VerifyEmailView(),
       },
-      onGenerateRoute: (setting) {
-        if (setting.name == verifyEmailRoute) {
-          final user = setting.arguments as AuthUser;
-          return MaterialPageRoute(
-            builder: (context) {
-              return VerifyEmailView(user: user);
-            },
-          );
-        }
-        return null;
-      },
+      // onGenerateRoute: (setting) {
+      //   if (setting.name == verifyEmailRoute) {
+      //     final user = setting.arguments as AuthUser;
+      //     return MaterialPageRoute(
+      //       builder: (context) {
+      //         return VerifyEmailView(user: user);
+      //       },
+      //     );
+      //   }
+      //   return null;
+      // },
     ),
   );
 }

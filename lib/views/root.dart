@@ -30,9 +30,10 @@ class _RootState extends State<Root> {
         })
         .listen((authUser) async {
           // if (mounted) return; // prevents setState on disposed widget
+          // Future.microtask(() async {
           if (authUser != null) {
             try {
-              await authUser.reload();
+              await AuthServices.firebase().reload();
               if (mounted) {
                 setState(() {
                   _authUser = AuthServices.firebase().currentUser;
@@ -58,6 +59,7 @@ class _RootState extends State<Root> {
               });
             }
           }
+          // });
         });
   }
 
@@ -83,7 +85,7 @@ class _RootState extends State<Root> {
     if (_authUser == null) {
       return const LoginView();
     } else if (!_authUser!.isEmailVerified) {
-      return VerifyEmailView(user: _authUser!);
+      return VerifyEmailView();
     } else {
       return const Home();
     }
