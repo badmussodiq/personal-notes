@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:new_begining/constants/routes.dart';
+import 'package:new_begining/enums/menu_actions_enum.dart';
 import 'package:new_begining/services/auth/auth_services.dart';
 
 class Home extends StatefulWidget {
@@ -10,8 +11,6 @@ class Home extends StatefulWidget {
   @override
   State<Home> createState() => _HomeState();
 }
-
-enum MenuAction { logout, settings, profile }
 
 class _HomeState extends State<Home> {
   @override
