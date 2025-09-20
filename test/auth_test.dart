@@ -3,7 +3,6 @@ import 'package:new_begining/services/auth/auth_providers.dart'
     as auth_provider
     show AuthProvider;
 import 'package:new_begining/services/auth/auth_users.dart';
-import 'package:test/test.dart';
 
 void main() {
 }
