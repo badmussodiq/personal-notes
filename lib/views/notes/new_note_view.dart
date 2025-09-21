@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class AddNewNote extends StatefulWidget {
-  const AddNewNote({super.key});
+class NewNotView extends StatefulWidget {
+  const NewNotView({super.key});
 
   @override
-  State<AddNewNote> createState() => _AddNewNoteState();
+  State<NewNotView> createState() => _NewNotView();
 }
 
-class _AddNewNoteState extends State<AddNewNote> {
+class _NewNotView extends State<NewNotView> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Text("New Note view");
   }
 }
