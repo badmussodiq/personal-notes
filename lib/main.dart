@@ -14,7 +14,7 @@ import 'package:new_begining/views/authentication/register_view.dart'
 
 import 'package:new_begining/views/authentication/verify_view.dart'
     show VerifyEmailView;
-import 'package:new_begining/views/home_page.dart' show Home;
+import 'package:new_begining/views/notes/notes_view.dart' show NotesView;
 
 import 'package:new_begining/views/root.dart' show Root;
 
@@ -46,7 +46,7 @@ void main() async {
       ),
       home: const Root(),
       routes: {
-        notesRoute: (context) => const Home(),
+        notesRoute: (context) => const NotesView(),
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),

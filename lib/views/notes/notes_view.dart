@@ -7,14 +7,14 @@ import 'package:new_begining/services/auth/auth_services.dart';
 import 'package:new_begining/services/auth/auth_users.dart';
 import 'package:new_begining/services/crud/notes_services.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class NotesView extends StatefulWidget {
+  const NotesView({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<NotesView> createState() => _NotesView();
 }
 
-class _HomeState extends State<Home> {
+class _NotesView extends State<NotesView> {
   late final NotesServices _notesServices;
   AuthUser get authUser => AuthServices.firebase().currentUser!;
 
@@ -66,6 +66,10 @@ class _HomeState extends State<Home> {
             },
             itemBuilder: (context) {
               return const [
+                PopupMenuItem<MenuAction>(
+                  value: MenuAction.logout,
+                  child: Text('Logout'),
+                ),
                 PopupMenuItem<MenuAction>(
                   value: MenuAction.logout,
                   child: Text('Logout'),

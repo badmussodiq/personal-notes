@@ -5,7 +5,7 @@ import 'package:new_begining/services/auth/auth_services.dart';
 import 'package:new_begining/services/auth/auth_users.dart';
 import 'package:new_begining/views/authentication/login_view.dart';
 import 'package:new_begining/views/authentication/verify_view.dart';
-import 'package:new_begining/views/home_page.dart';
+import 'package:new_begining/views/notes/notes_view.dart';
 
 class Root extends StatefulWidget {
   const Root({super.key});
@@ -87,7 +87,7 @@ class _RootState extends State<Root> {
     } else if (!_authUser!.isEmailVerified) {
       return VerifyEmailView();
     } else {
-      return const Home();
+      return const NotesView();
     }
   }
 }
