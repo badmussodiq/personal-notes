@@ -4,6 +4,8 @@ import 'dart:developer' as devtools show log;
 import 'package:new_begining/constants/routes.dart';
 import 'package:new_begining/enums/menu_actions_enum.dart';
 import 'package:new_begining/services/auth/auth_services.dart';
+import 'package:new_begining/services/auth/auth_users.dart';
+import 'package:new_begining/services/crud/notes_services.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,11 +15,27 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  late final NotesServices _notesServices;
+  AuthUser get authUser => AuthServices.firebase().currentUser!;
+
+  @override
+  void initState() {
+    _notesServices = NotesServices();
+    _notesServices.initialize(user: authUser);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notesServices.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Main UI'),
+        title: const Text('Your Notes'),
         backgroundColor: Colors.amber,
         actions: [
           PopupMenuButton<MenuAction>(
@@ -61,7 +79,51 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      body: const Text('Dashboard'),
+      body: FutureBuilder(
+        future: _notesServices.getOrCreateUser(email: authUser.email),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _notesServices.allNotes,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Text('Waiting for all notes......');
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No notes found');
+                  }
+
+                  final notes = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: notes.length,
+                    itemBuilder: (context, index) {
+                      final note = notes[index];
+                      return ListTile(
+                        title: Text(
+                          note.text.isEmpty ? 'Empty Note' : note.text,
+                        ),
+                        subtitle: Text('Synced: ${note.isSyncedWithCloud}'),
+                      );
+                    },
+                  );
+                  // switch (snapshot.connectionState) {
+                  //   case ConnectionState.waiting:
+                  //     return const Text('Waiting for all notes......');
+                  //   default:
+                  //     devtools.log("Inside the stream builder");
+                  //     return const CircularProgressIndicator();
+                  // }
+                },
+              );
+            default:
+              devtools.log("Inside the future builder");
+              return const CircularProgressIndicator();
+          }
+        },
+      ),
+      // body: const Text(''),
     );
   }
 }

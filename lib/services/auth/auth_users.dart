@@ -15,6 +15,6 @@ class AuthUser {
 
   factory AuthUser.fromFirebase(fire_base_auth.User user) => AuthUser(
     isEmailVerified: user.emailVerified,
-    email: user.email ?? '',
+    email: user.email!,
   );
 }

@@ -1,12 +1,17 @@
+import 'dart:async';
+import 'dart:developer' as devtools show log;
 import 'package:flutter/foundation.dart' show immutable;
+import 'package:flutter/material.dart';
 import 'package:new_begining/exceptions/custom_exceptions.dart'
     as exceptions
-    show DatabaseAlreadyOpenException;
+    show
+        DatabaseAlreadyOpenException,
+        CouldNotFoundUserException,
+        DatabaseNotOpenException;
 import 'package:new_begining/exceptions/custom_exceptions.dart';
+import 'package:new_begining/services/auth/auth_users.dart';
 
-import 'package:sqflite/sqflite.dart'
-    as sqflite
-    show getDatabasesPath, openDatabase, Database;
+import 'package:sqflite/sqflite.dart' as sqflite show openDatabase, Database;
 
 import 'package:path_provider/path_provider.dart'
     as path_provider
@@ -17,11 +22,41 @@ import 'package:path/path.dart' as p show join;
 /// NotesServices is a singleton class that provides methods to interact with the SQLite database.
 class NotesServices {
   sqflite.Database? _db;
+  List<DatabaseNotes> _notes = [];
+
+  static final NotesServices _shared = NotesServices._shareInstance();
+
+  NotesServices._shareInstance();
+
+  factory NotesServices() => _shared;
+
+  final _noteStreamController =
+      StreamController<List<DatabaseNotes>>.broadcast();
+
+  Stream<List<DatabaseNotes>> get allNotes => _noteStreamController.stream;
+
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFoundUserException catch (_) {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> _cacheNotes({required DatabaseUser user}) async {
+    final allUserNotes = await getAllNotes(owner: user);
+    _notes = allUserNotes.toList();
+    _noteStreamController.add(_notes);
+  }
 
   sqflite.Database _getDbInstanceOrThrow() {
     // final db = _db;
     if (_db == null) {
-      throw DatabaseNotOpenException('Database is not opened');
+      throw exceptions.DatabaseNotOpenException('Database is not opened');
     } else {
       return _db!;
     }
@@ -29,6 +64,7 @@ class NotesServices {
 
   /// CRUDE OPERATIONS
   Future<void> deleteUser({required String email}) async {
+    // await _ensureDbIsOpen();
     final db = _getDbInstanceOrThrow();
     final deletedUser = await db.delete(
       notesTable,
@@ -40,7 +76,8 @@ class NotesServices {
     }
   }
 
-  Future<DatabseUser> createUser({required String email}) async {
+  Future<DatabaseUser> createUser({required String email}) async {
+    // await _ensureDbIsOpen();
     _db = _getDbInstanceOrThrow();
     final results = await _db!.query(
       userTable,
@@ -54,10 +91,11 @@ class NotesServices {
     final userId = await _db!.insert(userTable, {
       emailColumn: email.toLowerCase(),
     });
-    return DatabseUser(id: userId, email: email);
+    return DatabaseUser(id: userId, email: email);
   }
 
-  Future<DatabseUser> getUser({required String email}) async {
+  Future<DatabaseUser> getUser({required String email}) async {
+    // await _ensureDbIsOpen();
     _db = _getDbInstanceOrThrow();
     final results = await _db!.query(
       userTable,
@@ -66,14 +104,17 @@ class NotesServices {
       whereArgs: [email.toLowerCase()],
     );
     if (results.isEmpty) {
-      throw Exception('Could not find user with email $email');
+      throw exceptions.CouldNotFoundUserException(
+        'Could not find user with email $email',
+      );
     } else {
-      return DatabseUser.fromUserRow(results.first);
+      return DatabaseUser.fromUserRow(results.first);
     }
   }
 
   /// CREATE NOTE FUNCTION
-  Future<DatabaseNotes> createNote({required DatabseUser owner}) async {
+  Future<DatabaseNotes> createNote({required DatabaseUser owner}) async {
+    // await _ensureDbIsOpen();
     _db = _getDbInstanceOrThrow();
     // make sure owner exists in the database with the correct id
     final dbUser = await getUser(email: owner.email);
@@ -87,15 +128,21 @@ class NotesServices {
       textColumn: text,
       isSyncedWithCloudColumn: 1,
     });
-    return DatabaseNotes(
+
+    final note = DatabaseNotes(
       id: noteId,
       userId: owner.id,
       text: text,
       isSyncedWithCloud: true,
     );
+
+    _notes.add(note);
+    _noteStreamController.add(_notes);
+    return note;
   }
 
   Future<DatabaseNotes> getNote({required int id}) async {
+    // await _ensureDbIsOpen();
     _db = _getDbInstanceOrThrow();
     final notes = await _db!.query(
       notesTable,
@@ -106,13 +153,18 @@ class NotesServices {
     if (notes.isEmpty) {
       throw Exception('Could not find note with id $id');
     } else {
-      return DatabaseNotes.fromRow(notes.first);
+      final note = DatabaseNotes.fromRow(notes.first);
+      _notes.removeWhere((note) => note.id == id);
+      _notes.add(note);
+      _noteStreamController.add(_notes);
+      return note;
     }
   }
 
   Future<Iterable<DatabaseNotes>> getAllNotes({
-    required DatabseUser owner,
+    required DatabaseUser owner,
   }) async {
+    // await _ensureDbIsOpen();
     _db = _getDbInstanceOrThrow();
     // make sure owner exists in the database with the correct id
     final dbUser = await getUser(email: owner.email);
@@ -132,6 +184,7 @@ class NotesServices {
     required DatabaseNotes note,
     required String text,
   }) async {
+    // await _ensureDbIsOpen();
     _db = _getDbInstanceOrThrow();
     // make sure note exists
     final dbNote = await getNote(id: note.id);
@@ -141,30 +194,88 @@ class NotesServices {
     // update the note
     final updatedCount = await _db!.update(
       notesTable,
-      {
-        textColumn: text,
-        isSyncedWithCloudColumn: 0,
-      },
+      {textColumn: text, isSyncedWithCloudColumn: 0},
       where: 'id = ?',
       whereArgs: [note.id],
     );
     if (updatedCount == 0) {
       throw Exception('Could not update note with id ${note.id}');
     } else {
-      return await getNote(id: note.id);
+      final updatedNote = await getNote(id: note.id);
+      _notes.removeWhere((note) => note.id == updatedNote.id);
+      _notes.add(updatedNote);
+      _noteStreamController.add(_notes);
+      return updatedNote;
+    }
+  }
+
+  Future<void> deleteNote({required int id}) async {
+    // await _ensureDbIsOpen();
+    _db = _getDbInstanceOrThrow();
+    final deletedCount = await _db!.delete(
+      notesTable,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (deletedCount == 0) {
+      throw Exception('Could not delete note with id $id');
+    } else {
+      _notes.removeWhere((note) => note.id == id);
+      _noteStreamController.add(_notes);
+    }
+  }
+
+  Future<void> deleteAllNotes({required int userId}) async {
+    // await _ensureDbIsOpen();
+    _db = _getDbInstanceOrThrow();
+    final deletedCount = await _db!.delete(
+      notesTable,
+      where: 'user_id=?',
+      whereArgs: [userId],
+    );
+    if (deletedCount == 0) {
+      throw Exception('Could not delete all notes');
+    } else {
+      _notes = [];
+      _noteStreamController.add(_notes);
     }
   }
 
   /// This method initializes a database upon first call.
   /// If the database is already initialized, it throws a [DatabaseAlreadyOpenException].
-  Future<void> initialize() async {
+  Future<void> initialize({required AuthUser user}) async {
+    // initialize db user
+    late final DatabaseUser dbuser;
+    try {
+      _db = await openDatabase();
+      dbuser = await getOrCreateUser(email: user.email);
+      devtools.log('Database user: $dbuser');
+    } on Exception catch (_) {
+      // devtools.log(e.toString());
+      rethrow;
+    }
+    await _cacheNotes(user: dbuser);
+  }
+
+  // Future<void> _ensureDbIsOpen() async {
+  //   try {
+  //     await openDatabase();
+  //   } on exceptions.DatabaseAlreadyOpenException {
+  //     //
+  //   }
+  // }
+
+  Future<sqflite.Database> openDatabase() async {
     if (_db != null) {
+      devtools.log('Database already opened');
       // database already opened
       throw exceptions.DatabaseAlreadyOpenException('Database already opened');
     }
+
     try {
       // step 1:
       // get the documents directory path from path_provider package
+
       final docsPath = await path_provider.getApplicationDocumentsDirectory();
       // step 2:
       // join the documents path with the database name to get the full database path
@@ -177,8 +288,7 @@ class NotesServices {
       await _db?.execute(createUserTable);
       // create notes table
       await _db?.execute(createNotesTable);
-
-      // step 4:
+      return _db!;
     } on path_provider.MissingPlatformDirectoryException catch (_) {
       throw Exception('Unable to get documents directory');
     }
@@ -187,7 +297,7 @@ class NotesServices {
   Future<void> close() async {
     final db = _db;
     if (db == null) {
-      throw DatabaseNotOpenException('Database is not opened');
+      throw exceptions.DatabaseNotOpenException('Database is not opened');
     } else {
       await db.close();
       _db = null;
@@ -199,15 +309,15 @@ class NotesServices {
 /// This class provides methods to initialize the database, create tables,
 /// and perform CRUD operations on notes.
 @immutable
-class DatabseUser {
+class DatabaseUser {
   final int id;
   final String email;
 
-  /// Constructor for creating a DatabseUser instance.
-  const DatabseUser({required this.id, required this.email});
+  /// Constructor for creating a DatabaseUser instance.
+  const DatabaseUser({required this.id, required this.email});
 
   /// get user row from user table
-  DatabseUser.fromUserRow(Map<String, Object?> map)
+  DatabaseUser.fromUserRow(Map<String, Object?> map)
     : id = map[idColumn] as int,
       email = map[emailColumn] as String;
 
@@ -222,7 +332,7 @@ class DatabseUser {
 
   // get instance equality
   @override
-  bool operator ==(covariant DatabseUser other) => id == other.id;
+  bool operator ==(covariant DatabaseUser other) => id == other.id;
 
   // get instace hashcode
   @override
@@ -306,7 +416,6 @@ const createNotesTable =
     $userIdColumn INTEGER NOT NULL,
     $textColumn TEXT,
     $isSyncedWithCloudColumn INTEGER DEFAULT 0,
-    FOREIGN KEY ($userIdColumn) REFERENCES $userTable($idColumn),
-    PRIMARY KEY ("id" AUTOINCREMENT)
+    FOREIGN KEY ($userIdColumn) REFERENCES $userTable($idColumn)
   );
 ''';
