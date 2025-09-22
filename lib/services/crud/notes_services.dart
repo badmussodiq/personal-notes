@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as devtools show log;
+// import 'dart:developer' as devtools show log;
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:flutter/material.dart';
 import 'package:new_begining/exceptions/custom_exceptions.dart'
@@ -26,12 +26,18 @@ class NotesServices {
 
   static final NotesServices _shared = NotesServices._shareInstance();
 
-  NotesServices._shareInstance();
+  NotesServices._shareInstance() {
+    _noteStreamController = StreamController<List<DatabaseNotes>>.broadcast(
+      onListen: () {
+        _noteStreamController.sink.add(_notes);
+      },
+    );
+  }
 
   factory NotesServices() => _shared;
 
-  final _noteStreamController =
-      StreamController<List<DatabaseNotes>>.broadcast();
+  late final StreamController<List<DatabaseNotes>> _noteStreamController;
+  // StreamController<List<DatabaseNotes>>.broadcast();
 
   Stream<List<DatabaseNotes>> get allNotes => _noteStreamController.stream;
 
@@ -249,7 +255,6 @@ class NotesServices {
     try {
       _db = await openDatabase();
       dbuser = await getOrCreateUser(email: user.email);
-      devtools.log('Database user: $dbuser');
     } on Exception catch (_) {
       // devtools.log(e.toString());
       rethrow;
@@ -267,7 +272,6 @@ class NotesServices {
 
   Future<sqflite.Database> openDatabase() async {
     if (_db != null) {
-      devtools.log('Database already opened');
       // database already opened
       throw exceptions.DatabaseAlreadyOpenException('Database already opened');
     }
