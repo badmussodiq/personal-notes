@@ -99,34 +99,36 @@ class _NotesView extends State<NotesView> {
               return StreamBuilder(
                 stream: _notesServices.allNotes,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Text('Waiting for all notes......');
-                  }
-
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text('No notes found');
-                  }
-
-                  final notes = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: notes.length,
-                    itemBuilder: (context, index) {
-                      final note = notes[index];
-                      return ListTile(
-                        title: Text(
-                          note.text.isEmpty ? 'Empty Note' : note.text,
-                        ),
-                        subtitle: Text('Synced: ${note.isSyncedWithCloud}'),
-                      );
-                    },
-                  );
-                  // switch (snapshot.connectionState) {
-                  //   case ConnectionState.waiting:
-                  //     return const Text('Waiting for all notes......');
-                  //   default:
-                  //     devtools.log("Inside the stream builder");
-                  //     return const CircularProgressIndicator();
+                  // if (snapshot.connectionState == ConnectionState.waiting) {
+                  //   return const Text('Waiting for all notes......');
                   // }
+
+                  // if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  //   return const Text('No notes found');
+                  // }
+
+                  // final notes = snapshot.data!;
+                  // return ListView.builder(
+                  //   itemCount: notes.length,
+                  //   itemBuilder: (context, index) {
+                  //     final note = notes[index];
+                  //     return ListTile(
+                  //       title: Text(
+                  //         note.text.isEmpty ? 'Empty Note' : note.text,
+                  //       ),
+                  //       subtitle: Text('Synced: ${note.isSyncedWithCloud}'),
+                  //     );
+                  //   },
+                  // );
+                  
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      return const Text('Waiting for all notes......');
+                    default:
+                      devtools.log("Inside the stream builder");
+                      return const CircularProgressIndicator();
+                  }
                 },
               );
             default:
