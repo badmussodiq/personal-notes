@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:new_begining/constants/routes.dart'
     show loginRoute, verifyEmailRoute;
-import 'package:new_begining/functions/show_error_dialog.dart'
+import 'package:new_begining/utilities/dialogs/show_error_dialog.dart'
     show showErrorDialog;
 import 'package:new_begining/services/auth/auth_exceptions.dart';
 import 'package:new_begining/services/auth/auth_services.dart';
