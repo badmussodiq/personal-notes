@@ -2,7 +2,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:new_begining/constants/routes.dart'
-    show loginRoute, newNoteRoute, notesRoute, registerRoute, verifyEmailRoute;
+    show
+        loginRoute,
+        createOrUpdateNoteRoute,
+        notesRoute,
+        registerRoute,
+        verifyEmailRoute;
 
 import 'package:new_begining/services/auth/auth_services.dart'
     show AuthServices;
@@ -15,7 +20,8 @@ import 'package:new_begining/views/authentication/register_view.dart'
 
 import 'package:new_begining/views/authentication/verify_view.dart'
     show VerifyEmailView;
-import 'package:new_begining/views/notes/new_note_view.dart' show NewNotView;
+import 'package:new_begining/views/notes/create_update_note_view.dart'
+    show CreateUpdateNoteView;
 import 'package:new_begining/views/notes/notes_view.dart' show NotesView;
 
 import 'package:new_begining/views/root.dart' show Root;
@@ -52,7 +58,7 @@ void main() async {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),
-        newNoteRoute: (context) => const NewNotView(),
+        createOrUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
       },
       // onGenerateRoute: (setting) {
       //   if (setting.name == verifyEmailRoute) {

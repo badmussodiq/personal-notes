@@ -6,17 +6,19 @@ import 'package:new_begining/utilities/dialogs/show_delete_dialog.dart';
 /// This function returns void, but it actually does
 /// something in the implementation.
 /// The function is a a type definintion not the implementation itself
-typedef DeleteNoteCallback = void Function(DatabaseNotes note);
+typedef NoteCallback = void Function(DatabaseNotes note);
 
 /// This view is a component, that renders a single text view to the user
 /// This view is a stateless widget
 class NotesListView extends StatelessWidget {
   final List<DatabaseNotes> notes;
-  final DeleteNoteCallback onDeleteNote;
+  final NoteCallback onDeleteNote;
+  final NoteCallback onTap;
   const NotesListView({
     super.key,
     required this.notes,
     required this.onDeleteNote,
+    required this.onTap,
   });
 
   @override
@@ -26,6 +28,9 @@ class NotesListView extends StatelessWidget {
       itemBuilder: (context, index) {
         final note = notes[index];
         return ListTile(
+          onTap: () {
+            onTap(note);
+          },
           title: Text(
             // note.text,
             note.text.isEmpty ? 'Empty Note' : note.text,

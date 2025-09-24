@@ -5,14 +5,16 @@ import 'package:new_begining/services/auth/auth_services.dart';
 import 'package:new_begining/services/crud/notes_services.dart';
 import 'dart:developer' as devtool show log;
 
-class NewNotView extends StatefulWidget {
-  const NewNotView({super.key});
+import 'package:new_begining/utilities/generics/get_arguments.dart';
+
+class CreateUpdateNoteView extends StatefulWidget {
+  const CreateUpdateNoteView({super.key});
 
   @override
-  State<NewNotView> createState() => _NewNotView();
+  State<CreateUpdateNoteView> createState() => _CreateUpdateNoteView();
 }
 
-class _NewNotView extends State<NewNotView> {
+class _CreateUpdateNoteView extends State<CreateUpdateNoteView> {
   DatabaseNotes? _note;
   late final NotesServices _notesServices;
   late final TextEditingController _textEditingController;
@@ -39,7 +41,15 @@ class _NewNotView extends State<NewNotView> {
   }
 
   // create new note
-  Future<DatabaseNotes> createNewNote() async {
+  Future<DatabaseNotes> createOrGetExistingNote(BuildContext context) async {
+    _note = context.getArgument<DatabaseNotes>();
+
+    if (_note != null) {
+      // _note = widgetNote;
+      _textEditingController.text = _note!.text;
+      return _note!;
+    }
+
     devtool.log("Creating a note");
     final existingNote = _note;
     if (existingNote != null) {
@@ -50,7 +60,8 @@ class _NewNotView extends State<NewNotView> {
     final currentUser = AuthServices.firebase().currentUser!;
     final email = currentUser.email;
     final owner = await _notesServices.getUser(email: email);
-    return await _notesServices.createNote(owner: owner);
+    _note = await _notesServices.createNote(owner: owner);
+    return _note!;
   }
 
   void _deleteNoteIfTextIsEmpty() {
@@ -85,11 +96,11 @@ class _NewNotView extends State<NewNotView> {
     return Scaffold(
       appBar: AppBar(title: const Text('New Note')),
       body: FutureBuilder(
-        future: createNewNote(),
+        future: createOrGetExistingNote(context),
         builder: (context, asyncSnapshot) {
           switch (asyncSnapshot.connectionState) {
             case ConnectionState.done:
-              _note = asyncSnapshot.data as DatabaseNotes;
+              // _note = asyncSnapshot.data as DatabaseNotes;
               _setupTextControllerListener();
               return Padding(
                 padding: EdgeInsetsGeometry.all(8.0),
