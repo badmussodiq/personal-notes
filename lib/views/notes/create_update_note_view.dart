@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:new_begining/services/auth/auth_services.dart';
-import 'package:new_begining/services/crud/notes_services.dart';
+import 'package:new_begining/services/crud/local_notes_services.dart';
 import 'dart:developer' as devtool show log;
 
 import 'package:new_begining/utilities/generics/get_arguments.dart';

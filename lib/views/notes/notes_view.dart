@@ -5,7 +5,7 @@ import 'package:new_begining/constants/routes.dart';
 import 'package:new_begining/enums/menu_actions_enum.dart';
 import 'package:new_begining/services/auth/auth_services.dart';
 import 'package:new_begining/services/auth/auth_users.dart';
-import 'package:new_begining/services/crud/notes_services.dart';
+import 'package:new_begining/services/crud/local_notes_services.dart';
 import 'package:new_begining/utilities/dialogs/show_logout_dialog.dart';
 import 'package:new_begining/views/notes/notes_list_view.dart';
 

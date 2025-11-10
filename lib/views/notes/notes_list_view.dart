@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_begining/services/crud/notes_services.dart';
+import 'package:new_begining/services/crud/local_notes_services.dart';
 import 'package:new_begining/utilities/dialogs/show_delete_dialog.dart';
 
 /// This is a callback function in dart programming

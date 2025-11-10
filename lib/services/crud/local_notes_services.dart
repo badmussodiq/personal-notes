@@ -41,6 +41,16 @@ class NotesServices {
 
   Stream<List<DatabaseNotes>> get allNotes => _noteStreamController.stream;
 
+  // Stream<List<DatabaseNotes>> get allNotes =>
+  //     _noteStreamController.stream.filter((note) {
+  //       final currentUser = _user;
+  //       if (currentUser != null) {
+  //       } else {
+  //         throw UserShouldBeSetBeforeReadingAllNotes();
+  //       }
+  //     });
+  
+
   Future<DatabaseUser> getOrCreateUser({required String email}) async {
     try {
       final user = await getUser(email: email);
@@ -255,11 +265,11 @@ class NotesServices {
     try {
       _db = await openDatabase();
       dbuser = await getOrCreateUser(email: user.email);
+      await _cacheNotes(user: dbuser);
     } on Exception catch (_) {
       // devtools.log(e.toString());
       rethrow;
     }
-    await _cacheNotes(user: dbuser);
   }
 
   // Future<void> _ensureDbIsOpen() async {
