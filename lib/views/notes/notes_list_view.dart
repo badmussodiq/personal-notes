@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:new_begining/services/crud/local_notes_services.dart';
+import 'package:new_begining/services/crud/cloud_notes_storage_services.dart';
 import 'package:new_begining/utilities/dialogs/show_delete_dialog.dart';
 
 /// This is a callback function in dart programming
 /// This function returns void, but it actually does
 /// something in the implementation.
 /// The function is a a type definintion not the implementation itself
-typedef NoteCallback = void Function(DatabaseNotes note);
+typedef NoteCallback = void Function(CloudNote note);
 
 /// This view is a component, that renders a single text view to the user
 /// This view is a stateless widget
 class NotesListView extends StatelessWidget {
-  final List<DatabaseNotes> notes;
+  // final List<CloudNote> notes;
+  final Iterable<CloudNote> notes;
   final NoteCallback onDeleteNote;
   final NoteCallback onTap;
   const NotesListView({
@@ -26,7 +27,8 @@ class NotesListView extends StatelessWidget {
     return ListView.builder(
       itemCount: notes.length,
       itemBuilder: (context, index) {
-        final note = notes[index];
+        // final note = notes[index];
+        final note = notes.elementAt(index);
         return ListTile(
           onTap: () {
             onTap(note);
@@ -52,7 +54,7 @@ class NotesListView extends StatelessWidget {
               // color: Color(const Color.fromARGB(0, 0, 0, 0).hashCode),
             ),
           ),
-          subtitle: Text('Synced: ${note.isSyncedWithCloud}'),
+          subtitle: Text('Synced: ${note.documentId}'),
         );
       },
     );

@@ -5,7 +5,7 @@ import 'package:new_begining/constants/routes.dart';
 import 'package:new_begining/enums/menu_actions_enum.dart';
 import 'package:new_begining/services/auth/auth_services.dart';
 import 'package:new_begining/services/auth/auth_users.dart';
-import 'package:new_begining/services/crud/local_notes_services.dart';
+import 'package:new_begining/services/crud/firebase_cloud_storage.dart';
 import 'package:new_begining/utilities/dialogs/show_logout_dialog.dart';
 import 'package:new_begining/views/notes/notes_list_view.dart';
 
@@ -17,13 +17,13 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesView extends State<NotesView> {
-  late final NotesServices _notesServices;
+  late final FirebaseCloudStorage _notesServices;
   AuthUser get authUser => AuthServices.firebase().currentUser!;
 
   @override
   void initState() {
-    _notesServices = NotesServices();
-    _notesServices.initialize(user: authUser);
+    _notesServices = FirebaseCloudStorage();
+    // _notesServices.initialize(user: authUser);
     super.initState();
   }
 
@@ -99,13 +99,8 @@ class _NotesView extends State<NotesView> {
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: _notesServices.getOrCreateUser(email: authUser.email),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return StreamBuilder(
-                stream: _notesServices.allNotes,
+      body: StreamBuilder(
+                stream: _notesServices.allNotes(ownerUserId: authUser.id),
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
@@ -117,7 +112,7 @@ class _NotesView extends State<NotesView> {
                       return NotesListView(
                         notes: notes,
                         onDeleteNote: (note) async {
-                          await _notesServices.deleteNote(id: note.id);
+                          await _notesServices.deleteNote(documentId: note.documentId);
                         },
                         onTap: (note) {
                           Navigator.of(
@@ -130,13 +125,45 @@ class _NotesView extends State<NotesView> {
                       return const CircularProgressIndicator();
                   }
                 },
-              );
-            default:
-              devtools.log("Inside the future builder");
-              return const CircularProgressIndicator();
-          }
-        },
-      ),
+              ),
+      // body: FutureBuilder(
+      //   future: _notesServices.getOrCreateUser(email: authUser.email),
+      //   builder: (context, snapshot) {
+      //     switch (snapshot.connectionState) {
+      //       case ConnectionState.done:
+      //         return StreamBuilder(
+      //           stream: _notesServices.allNotes,
+      //           builder: (context, snapshot) {
+      //             switch (snapshot.connectionState) {
+      //               case ConnectionState.waiting:
+      //               case ConnectionState.active:
+      //                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      //                   return Center(child: const Text('No Note Found'));
+      //                 }
+      //                 final notes = snapshot.data!;
+      //                 return NotesListView(
+      //                   notes: notes,
+      //                   onDeleteNote: (note) async {
+      //                     await _notesServices.deleteNote(id: note.id);
+      //                   },
+      //                   onTap: (note) {
+      //                     Navigator.of(
+      //                       context,
+      //                     ).pushNamed(createOrUpdateNoteRoute, arguments: note);
+      //                   },
+      //                 );
+      //               default:
+      //                 devtools.log("Inside the stream builder");
+      //                 return const CircularProgressIndicator();
+      //             }
+      //           },
+      //         );
+      //       default:
+      //         devtools.log("Inside the future builder");
+      //         return const CircularProgressIndicator();
+      //     }
+      //   },
+      // ),
       // body: const Text(''),
     );
   }
