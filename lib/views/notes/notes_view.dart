@@ -100,32 +100,32 @@ class _NotesView extends State<NotesView> {
         ],
       ),
       body: StreamBuilder(
-                stream: _notesServices.allNotes(ownerUserId: authUser.id),
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(child: const Text('No Note Found'));
-                      }
-                      final notes = snapshot.data!;
-                      return NotesListView(
-                        notes: notes,
-                        onDeleteNote: (note) async {
-                          await _notesServices.deleteNote(documentId: note.documentId);
-                        },
-                        onTap: (note) {
-                          Navigator.of(
-                            context,
-                          ).pushNamed(createOrUpdateNoteRoute, arguments: note);
-                        },
-                      );
-                    default:
-                      devtools.log("Inside the stream builder");
-                      return const CircularProgressIndicator();
-                  }
+        stream: _notesServices.allNotes(ownerUserId: authUser.id),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: const Text('No Note Found'));
+              }
+              final notes = snapshot.data!;
+              return NotesListView(
+                notes: notes,
+                onDeleteNote: (note) async {
+                  await _notesServices.deleteNote(documentId: note.documentId);
                 },
-              ),
+                onTap: (note) {
+                  Navigator.of(
+                    context,
+                  ).pushNamed(createOrUpdateNoteRoute, arguments: note);
+                },
+              );
+            default:
+              devtools.log("Inside the stream builder");
+              return const CircularProgressIndicator();
+          }
+        },
+      ),
       // body: FutureBuilder(
       //   future: _notesServices.getOrCreateUser(email: authUser.email),
       //   builder: (context, snapshot) {
