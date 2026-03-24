@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-
-import 'package:new_begining/constants/routes.dart'
-    show notesRoute, verifyEmailRoute;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:new_begining/services/auth/bloc/auth_bloc.dart';
+import 'package:new_begining/services/auth/bloc/auth_events.dart';
+import 'package:new_begining/services/auth/bloc/auth_state.dart';
 import 'package:new_begining/utilities/dialogs/show_error_dialog.dart'
     show showErrorDialog;
 import 'package:new_begining/services/auth/auth_exceptions.dart';
-import 'package:new_begining/services/auth/auth_services.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -37,99 +37,81 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Login'), backgroundColor: Colors.amber),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _email,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(hintText: 'Enter your email'),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              // keyboardType: TextInputType.emailAddress,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                hintText: 'Enter your password',
+    return BlocListener<AuthBloc, AuthStates>(
+      listener: (context, state) async {
+        if (state is AuthStateLoggedOut && state.exception != null) {
+          if (!context.mounted) return;
+
+          if (state.exception is BadCredentialsAuthException) {
+            await showErrorDialog(context, "Wrong credentials");
+          } else if (state.exception is UserNotFoundAuthException) {
+            await showErrorDialog(context, "User not found");
+          } else {
+            await showErrorDialog(context, "Authentication error");
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Login'),
+          backgroundColor: Colors.amber,
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _email,
+                enableSuggestions: false,
+                autocorrect: false,
+                decoration: const InputDecoration(hintText: 'Enter your email'),
               ),
             ),
-          ),
-          TextButton(
-            onPressed: () async {
-              // update loading state
-              setState(() {
-                _loading = true;
-              });
-              // Get email and password
-              final email = _email.text;
-              final password = _password.text;
-
-              // return;
-              //
-              try {
-                final authUser = await AuthServices.firebase().logIn(
-                  email: email,
-                  password: password,
-                );
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _password,
+                obscureText: true,
+                enableSuggestions: false,
+                // keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                decoration: const InputDecoration(
+                  hintText: 'Enter your password',
+                ),
+              ),
+            ),
+            // email field
+            // password field
+            TextButton(
+              onPressed: () async {
+                // update loading state
                 setState(() {
-                  _loading = false;
+                  _loading = true;
                 });
-                if (authUser.isEmailVerified && context.mounted) {
-                  Navigator.of(
-                    context,
-                  ).pushNamedAndRemoveUntil(notesRoute, (_) => false);
-                } else if (context.mounted) {
-                  Navigator.of(context).pushNamed(
-                    verifyEmailRoute,
-                    // arguments: authUser.firebaseUser,
-                  );
-                }
-              } on BadCredentialsAuthException catch (_) {
-                if (context.mounted) {
-                  setState(() {
-                    _loading = false;
-                  });
-                  await showErrorDialog(context, "User or Password is wrong");
-                }
-              } on GenericAuthException catch (e) {
-                if (context.mounted) {
-                  setState(() {
-                    _loading = false;
-                  });
-                  await showErrorDialog(context, e.toString());
-                }
-              }
-              // catch (e) {
-              //   if (context.mounted) {
-              //     setState(() {
-              //       _loading = false;
-              //     });
-              //     await showErrorDialog(context, e.toString());
-              //   }
-              // }
-            },
-            child: !_loading
-                ? Text('Login')
-                : const CircularProgressIndicator(padding: EdgeInsets.all(4.0)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(
-                context,
-              ).pushNamedAndRemoveUntil('/register/', (route) => false);
-            },
-            child: const Text('Not registered yet? Register here!'),
-          ),
-        ],
+                // Get email and password
+                final email = _email.text;
+                final password = _password.text;
+
+                context.read<AuthBloc>().add(
+                  AuthEventLogin(email: email, password: password),
+                );
+              },
+              child: !_loading
+                  ? Text('Login')
+                  : const CircularProgressIndicator(
+                      padding: EdgeInsets.all(4.0),
+                    ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil('/register/', (route) => false);
+              },
+              child: const Text('Not registered yet? Register here!'),
+            ),
+          ],
+        ),
       ),
     );
   }

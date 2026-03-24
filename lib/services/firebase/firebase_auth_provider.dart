@@ -7,6 +7,7 @@ import 'package:new_begining/services/auth/auth_providers.dart'
     as my_auth_provider
     show AuthProvider;
 import 'package:new_begining/services/auth/auth_users.dart' show AuthUser;
+import 'dart:developer' as devtools show log;
 
 class FirebaseAuthProvider implements my_auth_provider.AuthProvider {
   @override
@@ -77,11 +78,16 @@ class FirebaseAuthProvider implements my_auth_provider.AuthProvider {
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-credential') {
+        devtools.log(e.message!);
+        devtools.log(e.code);
         throw BadCredentialsAuthException();
       } else {
+        devtools.log(e.code);
+        devtools.log(e.message!);
         throw GenericAuthException();
       }
-    } catch (_) {
+    } catch (e) {
+      devtools.log(e.toString());
       throw GenericAuthException();
     }
   }

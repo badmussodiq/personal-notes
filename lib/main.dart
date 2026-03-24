@@ -1,5 +1,6 @@
 // entry point
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:new_begining/constants/routes.dart'
     show
@@ -9,8 +10,8 @@ import 'package:new_begining/constants/routes.dart'
         registerRoute,
         verifyEmailRoute;
 
-import 'package:new_begining/services/auth/auth_services.dart'
-    show AuthServices;
+import 'package:new_begining/services/auth/bloc/auth_bloc.dart';
+import 'package:new_begining/services/firebase/firebase_auth_provider.dart';
 
 import 'package:new_begining/views/authentication/login_view.dart'
     show LoginView;
@@ -29,7 +30,6 @@ import 'package:new_begining/views/root.dart' show Root;
 void main() async {
   // initialize widget flutter binding
   WidgetsFlutterBinding.ensureInitialized();
-  await AuthServices.firebase().initialize();
   runApp(
     MaterialApp(
       title: 'Flutter Demo',
@@ -52,7 +52,10 @@ void main() async {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const Root(),
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
+        child: const Root(),
+      ),
       routes: {
         notesRoute: (context) => const NotesView(),
         loginRoute: (context) => const LoginView(),

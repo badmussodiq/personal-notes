@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:developer' as devtools show log;
-
 import 'package:new_begining/constants/routes.dart';
 import 'package:new_begining/enums/menu_actions_enum.dart';
 import 'package:new_begining/services/auth/auth_services.dart';
 import 'package:new_begining/services/auth/auth_users.dart';
+import 'package:new_begining/services/auth/bloc/auth_bloc.dart';
+import 'package:new_begining/services/auth/bloc/auth_events.dart';
 import 'package:new_begining/services/crud/firebase_cloud_storage.dart';
 import 'package:new_begining/utilities/dialogs/show_logout_dialog.dart';
 import 'package:new_begining/views/notes/notes_list_view.dart';
@@ -64,12 +66,13 @@ class _NotesView extends State<NotesView> {
                   if (!shouldLogout) return;
                   // ignore: use_build_context_synchronously
                   // sign out the user from firebase
-                  await AuthServices.firebase().logOut();
+                  // await AuthServices.firebase().logOut();
                   if (context.mounted) {
                     // navigate to login view and remove all previous routes
-                    Navigator.of(
-                      context,
-                    ).pushNamedAndRemoveUntil(loginRoute, (_) => false);
+                    context.read<AuthBloc>().add(const AuthEventLogout());
+                    // Navigator.of(
+                    //   context,
+                    // ).pushNamedAndRemoveUntil(loginRoute, (_) => false);
                   }
                   break;
                 case MenuAction.settings:
