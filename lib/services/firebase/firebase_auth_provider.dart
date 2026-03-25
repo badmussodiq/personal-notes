@@ -27,17 +27,24 @@ class FirebaseAuthProvider implements my_auth_provider.AuthProvider {
         throw UserNotLoggedInAuthException();
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        throw WeakPasswordAuthException();
-      } else if (e.code == 'email-already-in-use') {
-        throw EmailAlreadyInUseAuthException();
-      } else if (e.code == 'invalid-email') {
-        throw InvalidEmailAuthException();
-      } else {
-        throw GenericAuthException();
-      }
-    } catch (_) {
-      throw GenericAuthException();
+    //   if (e.code == 'weak-password') {
+    //     throw WeakPasswordAuthException();
+    //   } else if (e.code == 'email-already-in-use') {
+    //     throw EmailAlreadyInUseAuthException();
+    //   } else if (e.code == 'invalid-email') {
+    //     throw InvalidEmailAuthException();
+    //   } else {
+    //     throw GenericAuthException();
+    //   }
+    // } catch (_) {
+    //   throw GenericAuthException();
+
+      throw GeneralException(code: 500, message: e.code);
+    } catch (e) {
+      throw GeneralException(
+        code: e.hashCode,
+        message: e.runtimeType.toString(),
+      );
     }
   }
 
@@ -84,11 +91,11 @@ class FirebaseAuthProvider implements my_auth_provider.AuthProvider {
       } else {
         devtools.log(e.code);
         devtools.log(e.message!);
-        throw GenericAuthException();
+        throw GeneralException(message: e.code, code: 400);
       }
     } catch (e) {
       devtools.log(e.toString());
-      throw GenericAuthException();
+      throw GeneralException(message: "Internal Server Error", code: 500);
     }
   }
 

@@ -24,12 +24,7 @@ class AuthStateLoggedOut extends AuthStates {
   const AuthStateLoggedOut({this.exception});
 }
 
-// state when login fails
-// class AuthStateLoginFailure extends AuthStates {
-//   final Exception exception;
-//   const AuthStateLoginFailure({required this.exception});
-// }
-
+// state when logout user failed
 class AuthStateLoggedOutFailure extends AuthStates {
   final Exception exception;
   const AuthStateLoggedOutFailure({required this.exception});
@@ -39,3 +34,16 @@ class AuthStateLoggedOutFailure extends AuthStates {
 class AuthStateNeedsVerification extends AuthStates {
   const AuthStateNeedsVerification();
 }
+
+class GeneralExceptionState extends AuthStates {
+  final int? code;
+  final String message;
+  final Exception? exception;
+
+  const GeneralExceptionState({
+    this.code,
+    required this.message,
+    required this.exception
+  });
+}
+

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:new_begining/constants/routes.dart';
 import 'package:new_begining/services/auth/bloc/auth_bloc.dart';
 import 'package:new_begining/services/auth/bloc/auth_events.dart';
 import 'package:new_begining/services/auth/bloc/auth_state.dart';
@@ -15,9 +16,7 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  late final TextEditingController _email;
-  late final TextEditingController _password;
-  bool _loading = false;
+  late final TextEditingController _email, _password;
 
   //This method set the initial state of application
   @override
@@ -37,7 +36,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthStates>(
+    return BlocConsumer<AuthBloc, AuthStates>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut && state.exception != null) {
           if (!context.mounted) return;
@@ -51,68 +50,69 @@ class _LoginViewState extends State<LoginView> {
           }
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Login'),
-          backgroundColor: Colors.amber,
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _email,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(hintText: 'Enter your email'),
-              ),
+      // child: BlocBuilder<AuthBloc, AuthStates>(
+        builder: (context, state) {
+          bool loading = state is AuthStateLoading;
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Login'),
+              backgroundColor: Colors.amber,
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _password,
-                obscureText: true,
-                enableSuggestions: false,
-                // keyboardType: TextInputType.emailAddress,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your password',
+            body: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _email,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    decoration: const InputDecoration(hintText: 'Enter your email'),
+                  ),
                 ),
-              ),
-            ),
-            // email field
-            // password field
-            TextButton(
-              onPressed: () async {
-                // update loading state
-                setState(() {
-                  _loading = true;
-                });
-                // Get email and password
-                final email = _email.text;
-                final password = _password.text;
-
-                context.read<AuthBloc>().add(
-                  AuthEventLogin(email: email, password: password),
-                );
-              },
-              child: !_loading
-                  ? Text('Login')
-                  : const CircularProgressIndicator(
-                      padding: EdgeInsets.all(4.0),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _password,
+                    obscureText: true,
+                    enableSuggestions: false,
+                    // keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter your password',
                     ),
+                  ),
+                ),
+                // email field
+                // password field
+                TextButton(
+                  onPressed: () async {
+                    // Get email and password
+                    final email = _email.text;
+                    final password = _password.text;
+
+                    context.read<AuthBloc>().add(
+                      AuthEventLogin(email: email, password: password),
+                    );
+                  },
+                  child: !loading
+                      ? Text('Login')
+                      : const CircularProgressIndicator(
+                          padding: EdgeInsets.all(4.0),
+                        ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamedAndRemoveUntil(registerRoute, (route) => false);
+                  },
+                  child: const Text('Not registered yet? Register here!'),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil('/register/', (route) => false);
-              },
-              child: const Text('Not registered yet? Register here!'),
-            ),
-          ],
-        ),
-      ),
+          );
+        }
+      // ),
     );
   }
 }
