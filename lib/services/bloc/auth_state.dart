@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:new_begining/services/auth/auth_exceptions.dart';
 import 'package:new_begining/services/auth/auth_users.dart';
 
 // base class for all auth states
@@ -18,10 +19,16 @@ class AuthStateLoading extends AuthStates {
   const AuthStateLoading();
 }
 
+class AppInitializationState extends AuthStates {
+  const AppInitializationState();
+}
+
+
 // state when user is logged out
 class AuthStateLoggedOut extends AuthStates {
-  final Exception? exception;
-  const AuthStateLoggedOut({this.exception});
+  final GeneralException? exception;
+  final bool isLoading;
+  const AuthStateLoggedOut({this.exception, required this.isLoading});
 }
 
 // state when logout user failed

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:new_begining/constants/routes.dart'
     show loginRoute;
-import 'package:new_begining/services/auth/bloc/auth_bloc.dart';
-import 'package:new_begining/services/auth/bloc/auth_events.dart';
-import 'package:new_begining/services/auth/bloc/auth_state.dart';
+import 'package:new_begining/services/bloc/custom/custom_bloc.dart';
+import 'package:new_begining/services/bloc/custom/custom_state.dart';
 import 'package:new_begining/utilities/dialogs/show_error_dialog.dart'
     show showErrorDialog;
-import 'package:new_begining/services/auth/auth_exceptions.dart';
+import '../../services/bloc/custom/custom_event.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -37,23 +36,13 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthStates>(
+    return BlocConsumer<CustomBloc, CustomState>(
       listener: (context, state) async {
-        if (state is GeneralExceptionState) {
-          if (!context.mounted) return;
-
-          if (state.exception is UserNotLoggedInAuthException) {
-            await showErrorDialog(
-              context,
-              "Registration seems to be unsuccessful at the moment",
-            );
-          } else if (state.exception is GeneralException) {
-            await showErrorDialog(context, state.message);
-          }
+        if(state.exception != null){
+          await showErrorDialog(context, state.exception!.message);
         }
       },
       builder: (context, state) {
-        bool loading = state is AuthStateLoading;
         return Scaffold(
           appBar: AppBar(
             title: const Text('Register'),
@@ -92,8 +81,8 @@ class _RegisterViewState extends State<RegisterView> {
                 onPressed: () async {
                   final email = _email.text;
                   final password = _password.text;
-                  context.read<AuthBloc>().add(
-                    AuthEventRegister(email: email, password: password),
+                  context.read<CustomBloc>().add(
+                    CustomEventRegister(email: email, password: password),
                   );
                   // try {
                   //   await AuthServices.firebase().createUser(
@@ -129,7 +118,7 @@ class _RegisterViewState extends State<RegisterView> {
                   //   }
                   // }
                 },
-                child: !loading
+                child: !state.isLoading
                     ? Text('Register')
                     : const CircularProgressIndicator(),
               ),

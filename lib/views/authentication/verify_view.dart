@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:new_begining/services/auth/auth_services.dart';
-import 'package:new_begining/services/auth/bloc/auth_bloc.dart' show AuthBloc;
-import 'package:new_begining/services/auth/bloc/auth_events.dart';
-import 'package:new_begining/services/auth/bloc/auth_state.dart' show AuthStates;
+import 'package:new_begining/services/bloc/auth_bloc.dart' show AuthBloc;
+import '../../services/bloc/auth_events.dart';
+import '../../services/bloc/custom/custom_bloc.dart';
+import '../../services/bloc/custom/custom_event.dart';
+import '../../services/bloc/custom/custom_state.dart';
 
 class VerifyEmailView extends StatelessWidget {
   // final AuthUser user;
@@ -14,7 +15,7 @@ class VerifyEmailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthStates>(
+    return BlocConsumer<CustomBloc, CustomState>(
       listener: (context, state) async {},
       builder: (context, state) {
         return Scaffold(
@@ -39,7 +40,9 @@ class VerifyEmailView extends StatelessWidget {
                     ),
                   ),
                   onPressed: () async {
-                    await AuthServices.firebase().sendEmailVerification();
+                    context.read<CustomBloc>().add(
+                      const CustomEventSendEmailVerification(),
+                    );
                   },
                   child: const Text(
                     'Resend Email Verification',
@@ -47,16 +50,11 @@ class VerifyEmailView extends StatelessWidget {
                   ),
                 ),
                 TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all<Color>(
-                      Colors.blue,
-                    ),
-                  ),
                   onPressed: () async {
                     context.read<AuthBloc>().add(AuthEventLogout());
                   },
                   child: const Text(
-                    'Back To Login',
+                    'Login',
                     style: TextStyle(color: Colors.amber),
                   ),
                 ),

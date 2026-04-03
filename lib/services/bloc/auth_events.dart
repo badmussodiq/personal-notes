@@ -30,3 +30,7 @@ class AuthEventLogin extends AuthEvents {
 class AuthEventLogout extends AuthEvents {
   const AuthEventLogout();
 }
+
+class AuthEventSendEmailVerification extends AuthEvents {
+  const AuthEventSendEmailVerification();
+}

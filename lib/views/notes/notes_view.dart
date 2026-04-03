@@ -5,11 +5,12 @@ import 'package:new_begining/constants/routes.dart';
 import 'package:new_begining/enums/menu_actions_enum.dart';
 import 'package:new_begining/services/auth/auth_services.dart';
 import 'package:new_begining/services/auth/auth_users.dart';
-import 'package:new_begining/services/auth/bloc/auth_bloc.dart';
-import 'package:new_begining/services/auth/bloc/auth_events.dart';
+import 'package:new_begining/services/bloc/custom/custom_bloc.dart';
 import 'package:new_begining/services/crud/firebase_cloud_storage.dart';
 import 'package:new_begining/utilities/dialogs/show_logout_dialog.dart';
 import 'package:new_begining/views/notes/notes_list_view.dart';
+
+import '../../services/bloc/custom/custom_event.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -69,7 +70,7 @@ class _NotesView extends State<NotesView> {
                   // await AuthServices.firebase().logOut();
                   if (context.mounted) {
                     // navigate to login view and remove all previous routes
-                    context.read<AuthBloc>().add(const AuthEventLogout());
+                    context.read<CustomBloc>().add(CustomEventLogout());;
                     // Navigator.of(
                     //   context,
                     // ).pushNamedAndRemoveUntil(loginRoute, (_) => false);

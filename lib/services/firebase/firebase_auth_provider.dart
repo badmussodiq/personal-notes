@@ -7,7 +7,6 @@ import 'package:new_begining/services/auth/auth_providers.dart'
     as my_auth_provider
     show AuthProvider;
 import 'package:new_begining/services/auth/auth_users.dart' show AuthUser;
-import 'dart:developer' as devtools show log;
 
 class FirebaseAuthProvider implements my_auth_provider.AuthProvider {
   @override
@@ -24,21 +23,12 @@ class FirebaseAuthProvider implements my_auth_provider.AuthProvider {
       if (user != null) {
         return user;
       } else {
-        throw UserNotLoggedInAuthException();
+        throw GeneralException(
+          message: "Creation Failed,Please Contact Support",
+          code: 500,
+        );
       }
     } on FirebaseAuthException catch (e) {
-    //   if (e.code == 'weak-password') {
-    //     throw WeakPasswordAuthException();
-    //   } else if (e.code == 'email-already-in-use') {
-    //     throw EmailAlreadyInUseAuthException();
-    //   } else if (e.code == 'invalid-email') {
-    //     throw InvalidEmailAuthException();
-    //   } else {
-    //     throw GenericAuthException();
-    //   }
-    // } catch (_) {
-    //   throw GenericAuthException();
-
       throw GeneralException(code: 500, message: e.code);
     } catch (e) {
       throw GeneralException(
@@ -81,41 +71,68 @@ class FirebaseAuthProvider implements my_auth_provider.AuthProvider {
       if (user != null) {
         return user;
       } else {
-        throw UserNotLoggedInAuthException();
+        throw GeneralException(
+            message: "Invalid Credentials",
+            code: 401,
+        );
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-credential') {
-        devtools.log(e.message!);
-        devtools.log(e.code);
-        throw BadCredentialsAuthException();
-      } else {
-        devtools.log(e.code);
-        devtools.log(e.message!);
-        throw GeneralException(message: e.code, code: 400);
-      }
+      int code = 400;
+      if (e.code == 'invalid-credentials') code = 401;
+      if (e.code == 'user-not-found') code = 404;
+      throw GeneralException(
+          message: e.code,
+          code: code,
+      );
     } catch (e) {
-      devtools.log(e.toString());
-      throw GeneralException(message: "Internal Server Error", code: 500);
+      throw GeneralException(
+        code: e.hashCode,
+        message: e.runtimeType.toString(),
+      );
     }
   }
 
   @override
   Future<void> logOut() async {
-    final user = currentUser;
-    if (user != null) {
-      await FirebaseAuth.instance.signOut();
-    } else {
-      throw UserNotLoggedInAuthException();
+    try {
+      final user = currentUser;
+      if (user != null) {
+        await FirebaseAuth.instance.signOut();
+      } else {
+        throw GeneralException(
+          message: "User instance not available",
+          code: 500,
+        );
+      }
+    } on FirebaseException catch (e) {
+      throw GeneralException(message: e.code, code: 400);
+    } catch (e) {
+      throw GeneralException(
+          message: "Application error",
+          code: 500,
+      );
     }
   }
 
   @override
   Future<void> sendEmailVerification() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return await user.sendEmailVerification();
-    } else {
-      throw UserNotLoggedInAuthException();
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        return await user.sendEmailVerification();
+      } else {
+        throw GeneralException(
+          message: "User instance is not available",
+          code: 500,
+        );
+      }
+    } on FirebaseException catch (e) {
+      throw GeneralException(message: e.code, code: 400);
+    } catch (e) {
+      throw GeneralException(
+        message: "Application Error",
+        code: 500,
+      );
     }
   }
 
@@ -125,7 +142,10 @@ class FirebaseAuthProvider implements my_auth_provider.AuthProvider {
     if (user != null) {
       await user.reload();
     } else {
-      throw UserNotLoggedInAuthException();
+      throw GeneralException(
+          message: "User instance not found",
+          code: 500,
+      );
     }
   }
 }

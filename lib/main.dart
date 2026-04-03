@@ -1,7 +1,6 @@
 // entry point
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:new_begining/constants/routes.dart'
     show
     loginRoute,
@@ -9,30 +8,25 @@ import 'package:new_begining/constants/routes.dart'
     notesRoute,
     registerRoute,
     verifyEmailRoute;
-
-import 'package:new_begining/services/auth/bloc/auth_bloc.dart';
+import 'package:new_begining/services/bloc/custom/custom_bloc.dart';
 import 'package:new_begining/services/firebase/firebase_auth_provider.dart';
-
 import 'package:new_begining/views/authentication/login_view.dart'
     show LoginView;
-
 import 'package:new_begining/views/authentication/register_view.dart'
     show RegisterView;
-
 import 'package:new_begining/views/authentication/verify_view.dart'
     show VerifyEmailView;
 import 'package:new_begining/views/notes/create_update_note_view.dart'
     show CreateUpdateNoteView;
 import 'package:new_begining/views/notes/notes_view.dart' show NotesView;
-
 import 'package:new_begining/views/root.dart' show Root;
 
 void main() async {
   // initialize widget flutter binding
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-      BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(FirebaseAuthProvider()),
+      BlocProvider<CustomBloc>(
+          create: (context) => CustomBloc(FirebaseAuthProvider()),
           child: MaterialApp(
             title: 'Flutter Demo',
             debugShowCheckedModeBanner: false,
