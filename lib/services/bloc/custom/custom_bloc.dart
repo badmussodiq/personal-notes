@@ -78,9 +78,11 @@ class CustomBloc extends Bloc<CustomEvent, CustomState> {
     //
     on<CustomEventSendEmailVerification>((event, emit) async {
       // emit(const AuthStateLoading());
+      emit(CustomState.verifying());
       try {
         await provider.sendEmailVerification();
         emit(state);
+
       } on GeneralException catch (e) {
         emit(CustomState.loggedOut(exception: e));
       }

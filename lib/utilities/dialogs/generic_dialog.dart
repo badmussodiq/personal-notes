@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
-typedef DialogOptionBuilder<T> = Map<String, T?> Function();
+// typedef DialogOptionBuilder<T> = Map<String, T?> Function();
+
+typedef DialogWidgetBuilder<T> = List<Widget> Function(BuildContext context);
 
 Future<T?> showGenericDialog<T>({
   required BuildContext context,
   required String title,
   required String content,
-  required DialogOptionBuilder optionBuilder,
+  required DialogWidgetBuilder optionBuilder,
 }) {
-  final options = optionBuilder();
+  // final options = optionBuilder();
   return showDialog(
     context: context,
     barrierColor: Color(Colors.accents.length),
@@ -16,20 +18,7 @@ Future<T?> showGenericDialog<T>({
       return AlertDialog(
         title: Text(title),
         content: Text(content),
-        actions: options.keys.map((optionTitle) {
-          //
-          final T value = options[optionTitle];
-          return TextButton(
-            child: Text(optionTitle),
-            onPressed: () {
-              if (value != null) {
-                Navigator.of(context).pop(value);
-              } else {
-                Navigator.of(context);
-              }
-            },
-          );
-        }).toList(),
+        actions: optionBuilder(context),
       );
     },
   );

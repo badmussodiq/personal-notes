@@ -40,6 +40,8 @@ class _LoginViewState extends State<LoginView> {
       listener: (context, state) async {
         if(state.exception != null){
           await showErrorDialog(context, state.exception!.message);
+        }else if(state.isLoading){
+
         }
       },
       builder: (context, state) {

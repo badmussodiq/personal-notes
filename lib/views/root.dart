@@ -24,20 +24,14 @@ class _RootState extends State<Root> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CustomBloc, CustomState>(
+      // listener: (context, state) {
+      //   // if (state.isLoading) {
+      //   //   LoadingScreen().show(context: context, text: 'Loading...');
+      //   // } else {
+      //   //   LoadingScreen().hide();
+      //   // }
+      // },
       builder: (context, state) {
-        // if (state is AuthStateLoggedIn) {
-        //   return const NotesView();
-        // } else if (state is AuthStateNeedsVerification) {
-        //   return const VerifyEmailView();
-        // } else if (state is AuthStateLoggedOut) {
-        //   return const LoginView();
-        // }
-        // else {
-        //   return const Scaffold(
-        //     body: Center(child: CircularProgressIndicator(color: Colors.cyan)),
-        //   );
-        // }
-
         switch (state.status) {
           case CustomStatus.authenticated:
             return const NotesView();
