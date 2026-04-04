@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:new_begining/services/bloc/auth_bloc.dart' show AuthBloc;
-import '../../services/bloc/auth_events.dart';
 import '../../services/bloc/custom/custom_bloc.dart';
 import '../../services/bloc/custom/custom_event.dart';
 import '../../services/bloc/custom/custom_state.dart';
@@ -51,7 +49,7 @@ class VerifyEmailView extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () async {
-                    context.read<AuthBloc>().add(AuthEventLogout());
+                    context.read<CustomBloc>().add(CustomEventLogout());
                   },
                   child: const Text(
                     'Login',
