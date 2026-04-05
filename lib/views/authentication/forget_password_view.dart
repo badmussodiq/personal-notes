@@ -18,7 +18,6 @@ class ForgetPasswordView extends StatefulWidget {
 class _ForgetPasswordViewState extends State<ForgetPasswordView> {
   late final TextEditingController _email;
 
-  // bool _loading = false;
 
   //This method set the initial state of application
   @override
@@ -47,6 +46,9 @@ class _ForgetPasswordViewState extends State<ForgetPasswordView> {
         } else {
           LoadingScreen().hide();
         }
+        if (context.mounted && state.hasSentEmail == true) {
+          showErrorDialog(context, "Mail Has been sent");
+        }
       },
       builder: (context, state) {
         return Scaffold(
@@ -73,7 +75,7 @@ class _ForgetPasswordViewState extends State<ForgetPasswordView> {
                   context.read<CustomBloc>().add(
                     CustomEventSendPasswordReset(email: email),
                   );
-                  // _email.dispose();
+                  _email.clear();
                 },
                 child: !state.isLoading
                     ? Text('Send Reset Link')

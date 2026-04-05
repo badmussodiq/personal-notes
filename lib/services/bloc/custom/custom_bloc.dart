@@ -8,7 +8,6 @@ import 'custom_state.dart';
 
 class CustomBloc extends Bloc<CustomEvent, CustomState> {
   CustomBloc(AuthProvider provider) : super(CustomState.unknown()) {
-
     // initialize handler when application is loading
     on<CustomEventInitialize>((event, emit) async {
       await provider.initialize();
@@ -82,24 +81,24 @@ class CustomBloc extends Bloc<CustomEvent, CustomState> {
       try {
         await provider.sendEmailVerification();
         emit(state);
-
       } on GeneralException catch (e) {
         emit(CustomState.loggedOut(exception: e));
       }
     });
 
+    // send password reset event handler
     on<CustomEventSendPasswordReset>((event, emit) async {
-      if(event.email != null){
+      if (event.email == null) {
         return;
       }
+
       emit(state.copyWith(exception: null, isLoading: true));
-      try{
+      try {
         await provider.sendPasswordReset(toEmail: event.email!);
-        emit(state.copyWith(isLoading: false));
-      }on GeneralException catch(e){
+        emit(state.copyWith(isLoading: false, hasSentEmail: true));
+      } on GeneralException catch (e) {
         emit(state.copyWith(isLoading: false, exception: e));
       }
     });
-
   }
 }

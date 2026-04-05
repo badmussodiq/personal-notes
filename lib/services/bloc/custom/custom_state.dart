@@ -14,11 +14,13 @@ class CustomState {
   final AuthUser? user;
   final GeneralException? exception;
   final bool isLoading;
+  final bool? hasSentEmail;
 
   const CustomState({
     required this.status,
     this.user,
     this.exception,
+    this.hasSentEmail,
     required this.isLoading,
   });
 
@@ -52,12 +54,15 @@ class CustomState {
     AuthUser? user,
     GeneralException? exception,
     bool? isLoading,
+    bool? hasSentEmail,
   }) {
     return CustomState(
       status: status ?? this.status,
-      user: user ?? this.user,
+      user: user != null ? this.user : null,
+      hasSentEmail: hasSentEmail ?? false,
       exception: exception != null ? this.exception : null,
       isLoading: isLoading ?? this.isLoading,
     );
   }
 }
+
