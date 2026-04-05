@@ -23,14 +23,14 @@ class _RootState extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CustomBloc, CustomState>(
-      // listener: (context, state) {
-      //   // if (state.isLoading) {
-      //   //   LoadingScreen().show(context: context, text: 'Loading...');
-      //   // } else {
-      //   //   LoadingScreen().hide();
-      //   // }
-      // },
+    return BlocConsumer<CustomBloc, CustomState>(
+      listener: (context, state) {
+        // if (state.isLoading) {
+        //   LoadingScreen().show(context: context, text: 'Loading...');
+        // } else {
+        //   LoadingScreen().hide();
+        // }
+      },
       builder: (context, state) {
         switch (state.status) {
           case CustomStatus.authenticated:

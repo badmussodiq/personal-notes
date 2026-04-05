@@ -5,11 +5,8 @@ import '../../services/bloc/custom/custom_event.dart';
 import '../../services/bloc/custom/custom_state.dart';
 
 class VerifyEmailView extends StatelessWidget {
-  // final AuthUser user;
 
   const VerifyEmailView({super.key});
-
-  // const VerifyEmailView({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +61,3 @@ class VerifyEmailView extends StatelessWidget {
     );
   }
 }
-
-/**
- *
- */

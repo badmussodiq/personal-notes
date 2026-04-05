@@ -26,7 +26,7 @@ class CustomState {
       const CustomState(status: CustomStatus.unknown, isLoading: true);
 
   factory CustomState.loading() =>
-      const CustomState(status: CustomStatus.loading, isLoading: true);
+      const CustomState(status: CustomStatus.loading, isLoading: false);
 
   factory CustomState.loggedOut({GeneralException? exception}) => CustomState(
     status: CustomStatus.unauthenticated,
@@ -43,9 +43,9 @@ class CustomState {
 
   factory CustomState.verifying() =>
       const CustomState(status: CustomStatus.verifyingEmail, isLoading: true);
+
   factory CustomState.verifiedCompleted () =>
   const CustomState(status: CustomStatus.authenticated, isLoading: false);
-
 
   CustomState copyWith({
     CustomStatus? status,

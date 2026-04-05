@@ -34,3 +34,9 @@ class CustomEventLogout extends CustomEvent {
 class CustomEventSendEmailVerification extends CustomEvent {
   const CustomEventSendEmailVerification();
 }
+
+class CustomEventSendPasswordReset extends CustomEvent {
+  final String? email;
+
+  const CustomEventSendPasswordReset({this.email});
+}

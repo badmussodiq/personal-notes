@@ -6,23 +6,24 @@ import 'package:new_begining/services/bloc/custom/custom_state.dart';
 import 'package:new_begining/utilities/dialogs/show_error_dialog.dart'
     show showErrorDialog;
 import '../../services/bloc/custom/custom_event.dart';
+import '../../utilities/controllers/loading_screen.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class ForgetPasswordView extends StatefulWidget {
+  const ForgetPasswordView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<ForgetPasswordView> createState() => _ForgetPasswordViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
-  late final TextEditingController _email, _password;
+class _ForgetPasswordViewState extends State<ForgetPasswordView> {
+  late final TextEditingController _email;
+
   // bool _loading = false;
 
   //This method set the initial state of application
   @override
   void initState() {
     _email = TextEditingController();
-    _password = TextEditingController();
     super.initState();
   }
 
@@ -30,7 +31,6 @@ class _LoginViewState extends State<LoginView> {
   @override
   void dispose() {
     _email.dispose();
-    _password.dispose();
     super.dispose();
   }
 
@@ -38,16 +38,20 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return BlocConsumer<CustomBloc, CustomState>(
       listener: (context, state) async {
-        if(state.exception != null){
+        if (state.exception != null) {
           await showErrorDialog(context, state.exception!.message);
-        }else if(state.isLoading){
+        }
 
+        if (context.mounted && state.isLoading) {
+          LoadingScreen().show(context: context, text: 'Loading...');
+        } else {
+          LoadingScreen().hide();
         }
       },
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Login'),
+            title: const Text('Forget Password'),
             backgroundColor: Colors.amber,
           ),
           body: Column(
@@ -63,32 +67,16 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _password,
-                  obscureText: true,
-                  enableSuggestions: false,
-                  // keyboardType: TextInputType.emailAddress,
-                  autocorrect: false,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter your password',
-                  ),
-                ),
-              ),
-              // email field
-              // password field
               TextButton(
                 onPressed: () async {
-                  // Get email and password
                   final email = _email.text;
-                  final password = _password.text;
                   context.read<CustomBloc>().add(
-                    CustomEventLogin(email: email, password: password),
+                    CustomEventSendPasswordReset(email: email),
                   );
+                  // _email.dispose();
                 },
                 child: !state.isLoading
-                    ? Text('Login')
+                    ? Text('Send Reset Link')
                     : const CircularProgressIndicator(
                         padding: EdgeInsets.all(4.0),
                       ),
@@ -97,17 +85,9 @@ class _LoginViewState extends State<LoginView> {
                 onPressed: () {
                   Navigator.of(
                     context,
-                  ).pushNamedAndRemoveUntil(forgetPasswortRoute, (route) => false);
+                  ).pushNamedAndRemoveUntil(loginRoute, (route) => false);
                 },
-                child: const Text('Forget Password?'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).pushNamedAndRemoveUntil(registerRoute, (route) => false);
-                },
-                child: const Text('Not registered yet? Register here!'),
+                child: const Text('Login'),
               ),
             ],
           ),

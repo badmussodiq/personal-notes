@@ -75,7 +75,7 @@ class CustomBloc extends Bloc<CustomEvent, CustomState> {
       }
     });
 
-    //
+    // resend email verification event handler
     on<CustomEventSendEmailVerification>((event, emit) async {
       // emit(const AuthStateLoading());
       emit(CustomState.verifying());
@@ -87,5 +87,19 @@ class CustomBloc extends Bloc<CustomEvent, CustomState> {
         emit(CustomState.loggedOut(exception: e));
       }
     });
+
+    on<CustomEventSendPasswordReset>((event, emit) async {
+      if(event.email != null){
+        return;
+      }
+      emit(state.copyWith(exception: null, isLoading: true));
+      try{
+        await provider.sendPasswordReset(toEmail: event.email!);
+        emit(state.copyWith(isLoading: false));
+      }on GeneralException catch(e){
+        emit(state.copyWith(isLoading: false, exception: e));
+      }
+    });
+
   }
 }

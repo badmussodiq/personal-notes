@@ -2,14 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:new_begining/constants/routes.dart'
-    show
-    loginRoute,
-    createOrUpdateNoteRoute,
-    notesRoute,
-    registerRoute,
-    verifyEmailRoute;
+    show loginRoute, createOrUpdateNoteRoute, notesRoute, registerRoute, verifyEmailRoute, forgetPasswortRoute;
 import 'package:new_begining/services/bloc/custom/custom_bloc.dart';
 import 'package:new_begining/services/firebase/firebase_auth_provider.dart';
+import 'package:new_begining/views/authentication/forget_password_view.dart';
 import 'package:new_begining/views/authentication/login_view.dart'
     show LoginView;
 import 'package:new_begining/views/authentication/register_view.dart'
@@ -56,6 +52,7 @@ void main() async {
               verifyEmailRoute: (context) => const VerifyEmailView(),
               createOrUpdateNoteRoute: (
                   context) => const CreateUpdateNoteView(),
+              forgetPasswortRoute: (context) => const ForgetPasswordView(),
             },
             // onGenerateRoute: (setting) {
             //   if (setting.name == verifyEmailRoute) {
